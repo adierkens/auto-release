@@ -26,7 +26,7 @@ import {
   IVersionOptions
 } from './auto-args';
 
-import httpsProxyAgent from 'https-proxy-agent';
+import HttpsProxyAgent from 'https-proxy-agent';
 import Changelog from './changelog';
 import Config from './config';
 import Git, { IGitOptions, IPRInfo } from './git';
@@ -184,7 +184,7 @@ export default class Auto {
       repo: config.repo,
       ...repository,
       token,
-      agent: httpsProxyAgent(proxyUrl),
+      agent: proxyUrl ? new HttpsProxyAgent(proxyUrl) : undefined,
       baseUrl: config.githubApi || 'https://api.github.com',
       graphqlBaseUrl:
         config.githubGraphqlApi || config.githubApi || 'https://api.github.com'
