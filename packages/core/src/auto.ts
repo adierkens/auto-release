@@ -42,7 +42,8 @@ import execPromise from './utils/exec-promise';
 import loadPlugin, { IPlugin } from './utils/load-plugins';
 import createLog, { ILogger } from './utils/logger';
 import { makeHooks } from './utils/make-hooks';
-
+const proxyUrl = process.env.https_proxy;
+const httpsProxyAgent = require('https-proxy-agent')
 const env = envCi();
 
 interface IAuthor {
@@ -182,6 +183,7 @@ export default class Auto {
       repo: config.repo,
       ...repository,
       token,
+      agent: httpsProxyAgent(proxyUrl),
       baseUrl: config.githubApi || 'https://api.github.com',
       graphqlBaseUrl:
         config.githubGraphqlApi || config.githubApi || 'https://api.github.com'
@@ -408,8 +410,7 @@ export default class Auto {
       pr,
       context = 'default',
       dryRun,
-      delete: deleteFlag,
-      edit: editFlag
+      delete: deleteFlag
     } = options;
     if (!this.git) {
       throw this.createErrorMessage();
@@ -423,27 +424,19 @@ export default class Auto {
         this.logger.log.info(
           `Would have deleted comment on ${prNumber} under "${context}" context`
         );
-      } else if (editFlag) {
-        this.logger.log.info(
-            `Would have edited the comment on ${prNumber} under "${context}" context.\n\nNew message: ${message}`
-        );
       } else {
         this.logger.log.info(
           `Would have commented on ${prNumber} under "${context}" context:\n\n${message}`
         );
       }
-    } else if (editFlag && message) {
-      await this.git.editComment(message, prNumber, context);
-      this.logger.log.success(`Edited comment on PR #${prNumber} under context "${context}"`);
     } else {
       if (deleteFlag) {
         await this.git.deleteComment(prNumber, context);
-        this.logger.log.success(`Deleted comment on PR #${prNumber} under context "${context}"`);
       }
 
       if (message) {
         await this.git.createComment(message, prNumber, context);
-        this.logger.log.success(`Commented on PR #${prNumber}`);
+        this.logger.log.success(`Commented on PR #${pr}`);
       }
     }
   }
