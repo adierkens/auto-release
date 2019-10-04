@@ -26,6 +26,7 @@ import {
   IVersionOptions
 } from './auto-args';
 
+import httpsProxyAgent from 'https-proxy-agent';
 import Changelog from './changelog';
 import Config from './config';
 import Git, { IGitOptions, IPRInfo } from './git';
@@ -42,8 +43,8 @@ import execPromise from './utils/exec-promise';
 import loadPlugin, { IPlugin } from './utils/load-plugins';
 import createLog, { ILogger } from './utils/logger';
 import { makeHooks } from './utils/make-hooks';
+
 const proxyUrl = process.env.https_proxy;
-const httpsProxyAgent = require('https-proxy-agent')
 const env = envCi();
 
 interface IAuthor {
